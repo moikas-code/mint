@@ -223,8 +223,8 @@ export default function Dragon() {
                   }
                 })()}
                 value={contractAddress}
-                onChange={(e:any) => {
-                  setContractAddress(e.value);
+                onChange={(e: any) => {
+                  setContractAddress(e);
                   console.log(e);
                 }}
               />
@@ -327,7 +327,7 @@ export default function Dragon() {
                 style={`w-100`}
               />
             ))}
-            {true && (
+            {false && (
               <div className='d-flex flex-column'>
                 Token Supply: {supply}
                 <Input
@@ -434,7 +434,7 @@ export default function Dragon() {
                       .then(async (cid) => {
                         const _nft = await TAKO.mint({
                           sdk,
-                          collection: toUnionAddress(contractAddress),
+                          collection: toUnionAddress(contractAddress.value),
                           data: {
                             uri: 'ipfs://ipfs/' + cid,
                             supply: supply,
@@ -442,7 +442,7 @@ export default function Dragon() {
                             royalties: [
                               {
                                 account:
-                                  contractAddress.split(':')[0] +
+                                  contractAddress.value.split(':')[0] +
                                   ':' +
                                   _address,
                                 value: royalties * 100,
