@@ -164,6 +164,9 @@ export default function Dragon() {
           .nft-wrapper {
             width: 200px;
           }
+          .icon-wrapper {
+            height: 300px;
+          }
         `}
       </style>
       <SEO
@@ -175,7 +178,7 @@ export default function Dragon() {
         keywords='gaming, nfts, web3'
       />
 
-      <div className='d-flex flex-column justify-content-center h-100'>
+      <div className='d-flex flex-column justify-content-center'>
         <div className='d-flex flex-column border border-dark m-5'>
           {/* TOP SECTION */}
           <div
@@ -233,8 +236,8 @@ export default function Dragon() {
               <div className='p-3'>
                 <NFTInput
                   id={'nft-input'}
-                  accept={'.png,gif,jpg,jpeg'}
-                  label={'Upload File:'}
+                  accept={'.png,.gif,.jpg, .jpeg,.tiff,.tif,.bmp,.svg,.webp'}
+                  label={'Upload Image File:'}
                   onChange={async (e: any): Promise<void> => {
                     const {cid, fileType}: any = e;
                     console.log('?', cid, fileType);
