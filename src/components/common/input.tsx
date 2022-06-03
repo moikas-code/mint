@@ -21,6 +21,7 @@ export default function Input({
   type,
   min,
   max,
+  value,
   pattern = '',
   placeholder = '',
   inputStyle = '',
@@ -42,6 +43,7 @@ export default function Input({
         <input
           className={inputStyle}
           type={type}
+          value={value}
           placeholder={placeholder}
           onChange={async (e) => {
             e.preventDefault();

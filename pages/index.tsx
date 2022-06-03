@@ -42,13 +42,12 @@ interface NFTFormProps extends MintFormProps {
 }
 
 export default function Dragon() {
+  const router = useRouter();
   const connection = React.useContext<any>(ConnectorContext);
   const sdk: string = connection.sdk;
   const _blockchain: string = connection.sdk?.wallet?.blockchain;
   const _address: string = connection.walletAddress;
 
-  const router = useRouter();
-  // const {contractAddress}: any = router.query;
   const [contractAddress, setContractAddress] = useState<string>('');
   const [complete, setComplete] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
@@ -61,6 +60,7 @@ export default function Dragon() {
   const [state, setState] = useState({
     ..._metadata,
     type: '',
+    mimeType: '',
     attributes: [],
     token: '',
     disable: true,
@@ -114,6 +114,7 @@ export default function Dragon() {
       }
     },
   });
+
   const handleFormResponses = (e: any, data: any) => {
     if (
       _metadataTypes[data + 'Type'] == 'string' ||
@@ -129,12 +130,6 @@ export default function Dragon() {
   }, [connection]);
 
   useEffect((): any => {
-    console.log({
-      blockChain: _blockchain,
-      address: _address,
-      continuation: continuation,
-      size: 100,
-    });
     typeof _address !== 'undefined' &&
       typeof _blockchain !== 'undefined' &&
       Owned_Collections({
@@ -170,155 +165,17 @@ export default function Dragon() {
         `}
       </style>
       <SEO
-        title={`Tako Labs - MINT
-        
-        `}
-        description='TAKOLABS.IO: Tako Labs is a WEB3 Community that is focused on the development of decentralized applications and services alwhile providing gaming content.'
+        title={`Tako Labs - MINT`}
+        description='TAKOLABS.IO: Tako Labs is a WEB3 Community that is focused on the development of decentralized applications and services as well providing gaming content.'
         twitter='takolabs'
         keywords='gaming, nfts, web3'
       />
 
       <div className='d-flex flex-column justify-content-center'>
-        <div className='d-flex flex-column border border-dark m-5'>
+        <div className='d-flex flex-column border border-dark m-5 h-100'>
           {/* TOP SECTION */}
           <div
             className={`col p-2 border border-dark d-inline-flex flex-column w-100 form-mx`}>
-            <div className=' my-1'>
-              <p className='mb-0'>Contract Type* (select one)</p>
-              <Select
-                className='text-black h-100 w-100'
-                options={((): any => {
-                  switch (_blockchain) {
-                    case 'POLYGON':
-                    case 'ETHEREUM':
-                      return [
-                        {
-                          label: 'RARIBLE ERC721 (Singles)',
-                          value:
-                            'ETHEREUM:0xF6793dA657495ffeFF9Ee6350824910Abc21356C',
-                        },
-                        {
-                          label: 'RARIBLE ERC1155 (Multiples)',
-                          value:
-                            'ERC11ETHEREUM:0xB66a603f4cFe17e3D27B87a8BfCaD319856518B855',
-                        },
-                      ];
-                    case 'TEZOS':
-                      return [
-                        {
-                          label: 'RARIBLE',
-                          value: 'TEZOS:KT18pVpRXKPY2c4U2yFEGSH3ZnhB2kL8kwXS',
-                        },
-                        ,
-                      ];
-                    case 'FLOW':
-                      return [
-                        {
-                          label: 'RARIBLE',
-                          value:
-                            'FLOW:0x35f8aee672cdE8e5FD09C93D2BfE4FF5a9cF0756',
-                        },
-                        ,
-                      ];
-
-                    default:
-                      break;
-                  }
-                })()}
-                value={contractAddress}
-                onChange={(e: any) => {
-                  setContractAddress(e);
-                  console.log(e);
-                }}
-              />
-            </div>
-            <div className='d-flex flex-row'>
-              <div className='p-3'>
-                <NFTInput
-                  id={'nft-input'}
-                  accept={'.png,.gif,.jpg, .jpeg,.tiff,.tif,.bmp,.svg,.webp'}
-                  label={'Upload Image File:'}
-                  onChange={async (e: any): Promise<void> => {
-                    const {cid, fileType}: any = e;
-                    console.log('?', cid, fileType);
-                    setState({
-                      ...state,
-                      canMint:
-                        fileType !== undefined &&
-                        fileType.split('/')[0] == 'image'
-                          ? true
-                          : false,
-                      fileData:
-                        fileType !== undefined &&
-                        fileType.split('/')[0] == 'image'
-                          ? 'https://ipfs.io/ipfs/' + e.cid
-                          : '',
-                      animation_url:
-                        fileType !== undefined &&
-                        fileType.split('/')[0] !== 'image'
-                          ? 'https://ipfs.io/ipfs/' + e.cid
-                          : '',
-                      type: fileType ? fileType.split('/')[0] : 'UNKNOWN',
-                      showInput: true,
-                      showMedia:
-                        fileType !== undefined &&
-                        fileType.split('/')[0] == 'image'
-                          ? true
-                          : false,
-                      memeType:
-                        fileType == 'application/zip'
-                          ? 'application/zip'
-                          : fileType,
-                    });
-                  }}
-                />
-                <br />
-
-                {state.memeType !== undefined &&
-                  state.memeType.split('/')[0] !== 'image' && (
-                    <>
-                      NFT COVER FOR VIDEO/AUDIO (NON IMAGE NFT)
-                      <br />
-                      <NFTInput
-                        id={'nft-input-cover'}
-                        label={'Cover:'}
-                        accept={'image/*'}
-                        onChange={async (e: any): Promise<void> => {
-                          const {cid, fileType} = e;
-                          setState({
-                            ...state,
-                            canMint:
-                              fileType !== undefined &&
-                              fileType.split('/')[0] == 'image'
-                                ? true
-                                : false,
-                            fileData: 'https://ipfs.io/ipfs/' + cid,
-                            disable: false,
-                            memeType: fileType,
-                            showMedia: true,
-                          });
-                        }}
-                      />
-                    </>
-                  )}
-              </div>
-              {state.showMedia &&
-                (state.fileData.length > 0 ||
-                  state.animation_url.length > 0) && (
-                  <>
-                    <div className={'icon-wrapper mx-auto'}>
-                      <img
-                        className='h-100 w-auto'
-                        src={state.fileData}
-                        alt=''
-                      />
-                    </div>
-                    <hr />
-                  </>
-                )}
-            </div>
-
-            <hr />
             {Object.keys(_metadata).map((data, key) => (
               <FormInputs
                 show={data === 'image' || state.showInput}
@@ -359,23 +216,147 @@ export default function Dragon() {
               <Input
                 id={'royalties'}
                 label={'NFT Royalties'}
-                type={'number'}
-                value={royalties.toString()}
-                placeholder={royalties.toString()}
+                type={'range'}
+                min={0}
+                max={50}
+                value={royalties}
                 inputStyle={'w-100'}
                 onChange={(e: any) => {
                   const {value} = e.target;
-                  value !== undefined && parseInt(value) > 50
-                    ? setRoyalties(50)
-                    : value !== undefined && parseInt(value) < 0
-                    ? setRoyalties(0)
-                    : value == undefined || value == null || value == ''
-                    ? setRoyalties(0)
-                    : setRoyalties(parseInt(value.match(/\d+/gi).join('')));
+                  setRoyalties(parseInt(value));
                 }}
               />
               <hr />
             </>
+          </div>
+          <div className='d-flex flex-row col pb-1 p-2 border border-dark'>
+            <div className='p-3'>
+              <NFTInput
+                id={'nft-input'}
+                accept={'.png,.gif,.jpg, .jpeg,.tiff,.tif,.bmp,.svg,.webp'}
+                label={'Upload Image File:'}
+                onChange={async (e: any): Promise<void> => {
+                  const {cid, fileType}: any = e;
+                  console.log('?', cid, fileType);
+                  setState({
+                    ...state,
+                    canMint:
+                      fileType !== undefined &&
+                      fileType.split('/')[0] == 'image'
+                        ? true
+                        : false,
+                    fileData:
+                      fileType !== undefined &&
+                      fileType.split('/')[0] == 'image'
+                        ? 'https://ipfs.io/ipfs/' + e.cid
+                        : '',
+                    animation_url:
+                      fileType !== undefined &&
+                      fileType.split('/')[0] !== 'image'
+                        ? 'https://ipfs.io/ipfs/' + e.cid
+                        : '',
+                    type: fileType ? fileType.split('/')[0] : 'UNKNOWN',
+                    showInput: true,
+                    showMedia:
+                      fileType !== undefined &&
+                      fileType.split('/')[0] == 'image'
+                        ? true
+                        : false,
+                    memeType:
+                      fileType == 'application/zip'
+                        ? 'application/zip'
+                        : fileType,
+                  });
+                }}
+              />
+              <br />
+
+              {state.memeType !== undefined &&
+                state.memeType.split('/')[0] !== 'image' && (
+                  <>
+                    NFT COVER FOR VIDEO/AUDIO (NON IMAGE NFT)
+                    <br />
+                    <NFTInput
+                      id={'nft-input-cover'}
+                      label={'Cover:'}
+                      accept={'image/*'}
+                      onChange={async (e: any): Promise<void> => {
+                        const {cid, fileType} = e;
+                        setState({
+                          ...state,
+                          canMint:
+                            fileType !== undefined &&
+                            fileType.split('/')[0] == 'image'
+                              ? true
+                              : false,
+                          fileData: 'https://ipfs.io/ipfs/' + cid,
+                          disable: false,
+                          memeType: fileType,
+                          showMedia: true,
+                        });
+                      }}
+                    />
+                  </>
+                )}
+            </div>
+            {state.showMedia &&
+              (state.fileData.length > 0 || state.animation_url.length > 0) && (
+                <>
+                  <div className={'icon-wrapper mx-auto'}>
+                    <img className='h-100 w-auto' src={state.fileData} alt='' />
+                  </div>
+                  <hr />
+                </>
+              )}
+          </div>
+
+          <div className='col pb-3 p-2 border border-dark'>
+            <p className='mb-0'>Contract Type* (select one)</p>
+            <Select
+              className='text-black h-100 w-100'
+              options={((): any => {
+                switch (_blockchain) {
+                  case 'POLYGON':
+                  case 'ETHEREUM':
+                    return [
+                      {
+                        label: 'RARIBLE ERC721 (Singles)',
+                        value:
+                          'ETHEREUM:0xF6793dA657495ffeFF9Ee6350824910Abc21356C',
+                      },
+                      {
+                        label: 'RARIBLE ERC1155 (Multiples)',
+                        value:
+                          'ETHEREUM:0xB66a603f4cFe17e3D27B87a8BfCaD319856518B855',
+                      },
+                    ];
+                  case 'TEZOS':
+                    return [
+                      {
+                        label: 'RARIBLE',
+                        value: 'TEZOS:KT18pVpRXKPY2c4U2yFEGSH3ZnhB2kL8kwXS',
+                      },
+                      ,
+                    ];
+                  case 'FLOW':
+                    return [
+                      {
+                        label: 'RARIBLE',
+                        value: 'FLOW:A.01ab36aaf654a13e.RaribleNFT',
+                      },
+                      ,
+                    ];
+
+                  default:
+                    break;
+                }
+              })()}
+              value={contractAddress}
+              onChange={(e: any) => {
+                setContractAddress(e);
+                console.log(typeof e);
+              }}
+            />
           </div>
           <div
             className={`col p-2 border border-dark d-inline-flex flex-column w-100 form-mx`}>
@@ -396,72 +377,74 @@ export default function Dragon() {
             />
             <hr />
             <div className={`d-flex flex-column w-100`}>
-              {
-                <Button
-                  disabled={false}
-                  buttonStyle={`btn-dark`}
-                  onClick={async () => {
-                    await setState({...state, isLoading: true});
-                    const json = JSON.stringify({
-                      ..._metadata,
-                      name: state.name,
-                      description: state.description,
-                      image: state.fileData,
-                      animation_url: state.animation_url,
-                      platform_url: 'https://mint.takolabs.io',
-                      attributes: [
-                        ...state.attributes,
-                        {
-                          trait_type: 'File Type',
-                          value: state.type.toUpperCase(),
-                        },
-                        {
-                          trait_type: 'Platform',
-                          value: 'TAKO LABS',
-                        },
-                      ],
-                      properties: state.properties,
-                    });
+              <Button
+                disabled={
+                  state.name.length === 0 ||
+                  state.description.length === 0 ||
+                  typeof contractAddress !== 'object'
+                }
+                buttonStyle={`btn-dark`}
+                onClick={async () => {
+                  await setState({...state, isLoading: true});
+                  const json = JSON.stringify({
+                    ..._metadata,
+                    name: state.name,
+                    description: state.description,
+                    image: state.fileData,
+                    animation_url: state.animation_url,
+                    platform_url: 'https://mint.takolabs.io',
+                    attributes: [
+                      ...state.attributes,
+                      {
+                        trait_type: 'File Type',
+                        value: state.type.toUpperCase(),
+                      },
+                      {
+                        trait_type: 'Platform',
+                        value: 'TAKO LABS',
+                      },
+                    ],
+                    properties: state.properties,
+                  });
 
-                    await nft
-                      .storeFileAsBlob(json)
-                      .then((_tkn) => {
-                        setState({
-                          ...state,
-                          token: _tkn,
-                          disable: !state.disable,
-                          isLoading: false,
-                        });
-                        return _tkn;
-                      })
-                      .then(async (cid) => {
-                        const _nft = await TAKO.mint({
-                          sdk,
-                          collection: toUnionAddress(contractAddress.value),
-                          data: {
-                            uri: 'ipfs://ipfs/' + cid,
-                            supply: supply,
-                            lazyMint: lazyMint,
-                            royalties: [
-                              {
-                                account:
-                                  contractAddress.value.split(':')[0] +
-                                  ':' +
-                                  _address,
-                                value: royalties * 100,
-                              },
-                            ],
-                          },
-                        }).catch((err) => {
-                          console.log(err.message);
-                        });
-                        console.log(_nft);
-                        setShow(false);
+                  await nft
+                    .storeFileAsBlob(json)
+                    .then((_tkn) => {
+                      setState({
+                        ...state,
+                        token: _tkn,
+                        disable: !state.disable,
+                        isLoading: false,
                       });
-                  }}>
-                  Mint
-                </Button>
-              }
+                      return _tkn;
+                    })
+                    .then(async (cid) => {
+                      const _nft = await TAKO.mint({
+                        sdk,
+                        collection: toUnionAddress(contractAddress.value),
+                        data: {
+                          uri: 'ipfs://ipfs/' + cid,
+                          supply: supply,
+                          lazyMint: lazyMint,
+                          royalties: [
+                            {
+                              account:
+                                contractAddress.value.split(':')[0] +
+                                ':' +
+                                _address,
+                              value: royalties * 100,
+                            },
+                          ],
+                        },
+                      }).catch((err) => {
+                        console.log(err.message);
+                      });
+                      console.log(_nft);
+                      setShow(false);
+                    });
+                }}>
+                Mint
+              </Button>
             </div>
 
             {state.token.length > 0 && (
