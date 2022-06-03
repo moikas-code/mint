@@ -440,7 +440,24 @@ export default function Dragon() {
                         console.log(err.message);
                       });
                       console.log(_nft);
+                      return _nft;
                       setShow(false);
+                    })
+                    .then(() => {
+                      setState({
+                        ..._metadata,
+                        type: '',
+                        mimeType: '',
+                        attributes: [],
+                        token: '',
+                        disable: true,
+                        showInput: false,
+                        showMedia: false,
+                        isLoading: false,
+                        cid: '',
+                        canMint: false,
+                        fileData: '',
+                      });
                     });
                 }}>
                 Mint
