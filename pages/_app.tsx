@@ -109,7 +109,6 @@ function MyApp({Component, pageProps}: AppProps) {
               {(connector: any): any => (
                 <SdkConnectionProvider connector={connector}>
                   {/*TODO: Create Layout*/}
-                  <Navbar />
                   <div id='tako' className='position-relative'>
                     <Component {...pageProps} />
                   </div>
