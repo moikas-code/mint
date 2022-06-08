@@ -157,7 +157,7 @@ export default function Dragon() {
       </div>
     );
   }
- return (
+  return (
     <>
       <style jsx>
         {`
@@ -181,7 +181,7 @@ export default function Dragon() {
       />
       <Navbar />
       {connection.state.status === 'disconnected' ||
-      connection.state.status === 'initializing'  ||
+      connection.state.status === 'initializing' ||
       connection === undefined ||
       typeof connection === 'undefined' ? (
         <div className='h-100 w-100 d-flex flex-column justify-content-center align-items-center'>
@@ -523,6 +523,15 @@ export default function Dragon() {
                   NFT.Storage
                 </a>
               </p>
+              <p>
+                Built on{' '}
+                <a
+                  target={'_blank'}
+                  rel={'norefferal'}
+                  href={'https://rarible.org'}>
+                  The Rarible Protocol
+                </a>
+              </p>
             </div>
           </div>
         </div>
@@ -530,5 +539,3 @@ export default function Dragon() {
     </>
   );
 }
-
-

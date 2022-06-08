@@ -11,12 +11,19 @@ export default function Connect() {
 
   return (
     <>
-      <style jsx>{``}</style>
+      <style jsx>{`
+        .w-161 {
+          width: 12.5rem;
+        }
+      `}</style>
       <div className='h-100 d-flex flex-column justify-content-center align-items-center'>
         <p>Please Connect to Continue with App</p>
         <ConnectOptions />
+        <br />
         <Link href={'/'}>
-          <a className='fnt-color-black text-decoration-none'>Go Back</a>
+          <a className='fnt-color-black text-decoration-none btn btn-outline-dark w-161'>
+            Go Back
+          </a>
         </Link>
       </div>
     </>
