@@ -200,7 +200,7 @@ export default function Dragon() {
         </div>
       ) : (
         <div className='nft-form w-100 d-flex flex-column justify-content-center mx-auto'>
-          <div className='d-flex flex-column border border-dark m-5 h-100 w-100'>
+          <div className='d-flex flex-column border border-dark m-5 h-100'>
             {/* TOP SECTION */}
             <div
               className={`col p-2 border border-dark d-inline-flex flex-column w-100 form-mx`}>
