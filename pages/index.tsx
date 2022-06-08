@@ -147,9 +147,17 @@ export default function Dragon() {
   }, [_address, _blockchain]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className='h-100 w-100 d-flex flex-column justify-content-center align-items-center'>
+        <h1>MINT | Tako Labs</h1>
+        <hr />
+        <p>Mint Your NFT's with Us ❤</p>
+        <br />
+        Loading
+      </div>
+    );
   }
-  return (
+ return (
     <>
       <style jsx>
         {`
@@ -173,7 +181,9 @@ export default function Dragon() {
       />
       <Navbar />
       {connection.state.status === 'disconnected' ||
-      connection.state.status === 'initializing' ? (
+      connection.state.status === 'initializing'  ||
+      connection === undefined ||
+      typeof connection === 'undefined' ? (
         <div className='h-100 w-100 d-flex flex-column justify-content-center align-items-center'>
           <h1>MINT | Tako Labs</h1>
           <hr />
@@ -182,8 +192,9 @@ export default function Dragon() {
           <Button
             className={'btn btn-outline-dark'}
             onClick={() => {
-            router.push('/connect');
-            }}>Connect
+              router.push('/connect');
+            }}>
+            Connect
           </Button>
           <br />
         </div>
@@ -193,6 +204,7 @@ export default function Dragon() {
             {/* TOP SECTION */}
             <div
               className={`col p-2 border border-dark d-inline-flex flex-column w-100 form-mx`}>
+              <p>Your Network: {_blockchain}</p>
               {Object.keys(_metadata).map((data, key) => (
                 <FormInputs
                   show={data === 'image' || state.showInput}
@@ -518,3 +530,5 @@ export default function Dragon() {
     </>
   );
 }
+
+
