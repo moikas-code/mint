@@ -746,6 +746,9 @@ const TAKO = {
 
     if (nft_data.type === MintType.OFF_CHAIN) {
       return nft_data.itemId;
+    } else if (nft_data.type === MintType.ON_CHAIN) {
+      await nft_data.transaction.wait();
+      return nft_data.itemId;
     }
   },
   sell_nft: async ({

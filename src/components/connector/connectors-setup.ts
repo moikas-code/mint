@@ -104,11 +104,12 @@ function mapEthereumWallet<O>(
   provider: AbstractConnectionProvider<O, EthereumProviderConnectionResult>
 ): ConnectionProvider<O, IWalletAndAddress> {
   return provider.map((state) => {
+    console.log('state', state, getEvmBlockchain(state.chainId));
     const wallet: any = {
       ...new EthereumWallet(
         new Web3Ethereum({web3: new Web3(state.provider), from: state.address})
       ),
-      blockchain:'ETHEREUM',
+      blockchain: getEvmBlockchain(state.chainId),
     };
     return {
       wallet,

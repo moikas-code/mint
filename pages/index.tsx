@@ -50,7 +50,7 @@ export default function Dragon() {
   const _blockchain: string = connection.sdk?.wallet?.blockchain;
   const _address: string = connection.walletAddress;
 
-  const [contractAddress, setContractAddress] = useState<string>('');
+  const [contractAddress, setContractAddress] = useState<any>({});
   const [complete, setComplete] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
   const [showOptions, setShowOptions] = useState<boolean>(false);
@@ -351,6 +351,18 @@ export default function Dragon() {
                 options={((): any => {
                   switch (_blockchain) {
                     case 'POLYGON':
+                      return [
+                        {
+                          label: 'AKKOROS ERC721 (Singles)',
+                          value:
+                            'POLYGON:0x2a890a07f9805f1338f4c6aede84ec45b77fa335',
+                        },
+                        {
+                          label: 'AKKOROS ERC1155 (Multiples)',
+                          value:
+                            'POLYGON:0x37f5694f04bd9a9c6c0d2c2629f6a70bbfdef3ff',
+                        },
+                      ];
                     case 'ETHEREUM':
                       return [
                         {
@@ -388,7 +400,7 @@ export default function Dragon() {
                 value={contractAddress}
                 onChange={(e: any) => {
                   setContractAddress(e);
-                  console.log(typeof e);
+                  console.log(typeof e, e);
                 }}
               />
             </div>
@@ -453,19 +465,23 @@ export default function Dragon() {
                         return _tkn;
                       })
                       .then(async (cid) => {
+                        console.log(_blockchain + ':' + _address,)
                         const _nft = await TAKO.mint({
                           sdk,
-                          collection: toUnionAddress(contractAddress.value),
+                          collection: contractAddress.value,
                           data: {
                             uri: 'ipfs://ipfs/' + cid,
+                            creators: [
+                              {
+                                account: `${_blockchain}:${_address}`,
+                                value: 1000,
+                              },
+                            ],
                             supply: supply,
                             lazyMint: lazyMint,
                             royalties: [
                               {
-                                account:
-                                  contractAddress.value.split(':')[0] +
-                                  ':' +
-                                  _address,
+                                account: _blockchain + ':' + _address,
                                 value: royalties * 100,
                               },
                             ],
