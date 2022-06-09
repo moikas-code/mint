@@ -435,13 +435,18 @@ export default function Dragon() {
                   />
                 </>
               )}
+              By Pressing Mint You Are Stating That You Are Authorized To Upload
+              The Following File To The Blockchain and IPFS as The Owner and
+              take Responsibility for any Damages or License Issues that May
+              Occur.
               <hr />
               <div className={`d-flex flex-column w-100`}>
                 <Button
                   disabled={
                     supply === 0 ||
                     state.name.length === 0 ||
-                    typeof contractAddress !== 'object' || state.fileData.length === 0
+                    typeof contractAddress !== 'object' ||
+                    state.fileData.length === 0
                   }
                   buttonStyle={`btn-dark`}
                   onClick={async () => {
@@ -528,7 +533,6 @@ export default function Dragon() {
                   Mint
                 </Button>
               </div>
-
               {state.token.length > 0 && (
                 <>
                   <hr />
