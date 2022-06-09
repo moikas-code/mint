@@ -1,34 +1,30 @@
 import {NetworkType as TezosNetwork} from '@airgap/beacon-sdk';
-import {EthereumWallet, FlowWallet, TezosWallet} from '@rarible/sdk-wallet';
 import {RaribleSdkEnvironment} from '@rarible/sdk/build/config/domain';
-import Web3 from 'web3';
-import {Web3Ethereum} from '@rarible/web3-ethereum';
 import {
-  AbstractConnectionProvider,
   ConnectionProvider,
   Connector,
-  EthereumProviderConnectionResult,
   IConnectorStateProvider,
   InjectedWeb3ConnectionProvider,
 } from '@rarible/connector';
-import {
-  FclConnectionProvider,
-  FlowProviderConnectionResult,
-} from '@rarible/connector-fcl';
+import {FclConnectionProvider} from '@rarible/connector-fcl';
 import {MEWConnectionProvider} from '@rarible/connector-mew';
-import {
-  BeaconConnectionProvider,
-  TezosProviderConnectionResult,
-} from '@rarible/connector-beacon';
+import {BeaconConnectionProvider} from '@rarible/connector-beacon';
 import {TorusConnectionProvider} from '@rarible/connector-torus';
 import {WalletLinkConnectionProvider} from '@rarible/connector-walletlink';
 import {WalletConnectConnectionProvider} from '@rarible/connector-walletconnect';
-import type {IWalletAndAddress} from './wallet-connetion';
-import {Blockchain} from '@rarible/api-client';
+import {PhantomConnectionProvider} from '@rarible/connector-phantom';
+import {SolflareConnectionProvider} from '@rarible/connector-solflare';
+import type {IWalletAndAddress} from '@rarible/connector-helper';
+import {
+  mapEthereumWallet,
+  mapFlowWallet,
+  mapSolanaWallet,
+  mapTezosWallet,
+} from '@rarible/connector-helper';
+
+
 // import { FortmaticConnectionProvider } from "@rarible/connector-fortmatic"
 // import { PortisConnectionProvider } from "@rarible/connector-portis"
-
-let chain: any;
 
 const ethereumRpcMap: Record<number, string> = {
   1: 'https://node-mainnet.rarible.com',
@@ -94,73 +90,10 @@ function environmentToTezosNetwork(environment: RaribleSdkEnvironment) {
     case 'staging':
     default:
       return {
-        accessNode: 'https://tezos-hangzhou-node.rarible.org',
-        network: TezosNetwork.HANGZHOUNET,
+        accessNode: 'https://test-tezos-node.rarible.org',
+        network: TezosNetwork.ITHACANET,
       };
   }
-}
-
-function mapEthereumWallet<O>(
-  provider: AbstractConnectionProvider<O, EthereumProviderConnectionResult>
-): ConnectionProvider<O, IWalletAndAddress> {
-  return provider.map((state) => {
-    console.log('state', state, getEvmBlockchain(state.chainId));
-    const wallet: any = {
-      ...new EthereumWallet(
-        new Web3Ethereum({web3: new Web3(state.provider), from: state.address})
-      ),
-      blockchain: getEvmBlockchain(state.chainId),
-    };
-    return {
-      wallet,
-      address: state.address,
-    };
-  });
-}
-
-function getEvmBlockchain(
-  chainId: number
-): Blockchain.POLYGON | Blockchain.ETHEREUM {
-  switch (chainId) {
-    case 137:
-      return Blockchain.POLYGON;
-    case 80001:
-      return Blockchain.POLYGON;
-    case 300501:
-      return Blockchain.POLYGON;
-    case 200501:
-      return Blockchain.POLYGON;
-    default:
-      return Blockchain.ETHEREUM;
-  }
-}
-
-function mapFlowWallet<O>(
-  provider: AbstractConnectionProvider<O, FlowProviderConnectionResult>
-): ConnectionProvider<O, IWalletAndAddress> {
-  return provider.map((state) => ({
-    wallet: new FlowWallet(state.fcl),
-    address: state.address,
-  }));
-}
-
-function mapTezosWallet<O>(
-  provider: AbstractConnectionProvider<O, TezosProviderConnectionResult>
-): ConnectionProvider<O, IWalletAndAddress> {
-  return provider.map(async (state) => {
-    const {beacon_provider: createBeaconProvider} = await import(
-      'tezos-sdk-module/dist/providers/beacon/beacon_provider'
-    );
-    const provider = await createBeaconProvider(
-      state.wallet as any,
-      state.toolkit
-    );
-
-    return {
-      wallet: new TezosWallet(provider),
-      address: state.address,
-    };
-  });
 }
 
 const state: IConnectorStateProvider = {
@@ -174,18 +107,16 @@ const state: IConnectorStateProvider = {
 };
 
 export function getConnector(environment: RaribleSdkEnvironment) {
-  const ethChainId =
-    environment === 'prod' ? chain : environmentToEthereumChainId(environment);
-
+  const ethChainId = environmentToEthereumChainId(environment);
   const ethNetworkName = ethereumNetworkMap[ethChainId];
-  const isEthNetwork = ['mainnet', 'ropsten', 'rinkeby', 'polygon'].includes(
+  const isEthNetwork = ['mainnet', 'ropsten', 'rinkeby'].includes(
     ethNetworkName
   );
-  console.log(ethNetworkName);
   const flowNetwork = environmentToFlowNetwork(environment);
   const tezosNetwork = environmentToTezosNetwork(environment);
-
-  const injected = mapEthereumWallet(new InjectedWeb3ConnectionProvider());
+  const injected = mapEthereumWallet(
+    new InjectedWeb3ConnectionProvider()
+  );
 
   const mew = mapEthereumWallet(
     new MEWConnectionProvider({
@@ -199,7 +130,7 @@ export function getConnector(environment: RaribleSdkEnvironment) {
     IWalletAndAddress
   > = mapTezosWallet(
     new BeaconConnectionProvider({
-      appName: 'Tako Labs',
+      appName: 'TAKO LABS',
       accessNode: tezosNetwork.accessNode,
       network: tezosNetwork.network,
     })
@@ -210,7 +141,7 @@ export function getConnector(environment: RaribleSdkEnvironment) {
       accessNode: flowNetwork.accessNode,
       walletDiscovery: flowNetwork.walletDiscovery,
       network: flowNetwork.network,
-      applicationTitle: 'Tako Labs',
+      applicationTitle: 'TAKO LABS',
       applicationIcon: 'https://rarible.com/favicon.png?2d8af2455958e7f0c812',
     })
   );
@@ -234,7 +165,7 @@ export function getConnector(environment: RaribleSdkEnvironment) {
         url: ethereumRpcMap[ethChainId],
       },
       {
-        appName: 'Tako Labs',
+        appName: 'TAKO LABS',
         appLogoUrl: 'https://rarible.com/static/logo-500.static.png',
         darkMode: true,
       }
@@ -248,6 +179,13 @@ export function getConnector(environment: RaribleSdkEnvironment) {
     })
   );
 
+  const phantomConnect = mapSolanaWallet(new PhantomConnectionProvider());
+  const solflareConnect = mapSolanaWallet(
+    new SolflareConnectionProvider({
+      network: environment === 'prod' ? 'mainnet-beta' : 'devnet',
+    })
+  );
+
   // Providers required secrets
   // const fortmatic = mapEthereumWallet(new FortmaticConnectionProvider({ apiKey: "ENTER", ethNetwork: { chainId: 4, rpcUrl: "https://node-rinkeby.rarible.com" } }))
   // const portis = mapEthereumWallet(new PortisConnectionProvider({ appId: "ENTER", network: "rinkeby" }))
@@ -257,7 +195,9 @@ export function getConnector(environment: RaribleSdkEnvironment) {
     .add(mew)
     .add(beacon)
     .add(fcl)
-    .add(walletConnect);
+    .add(walletConnect)
+    .add(phantomConnect)
+    .add(solflareConnect);
   // .add(portis)
   // .add(fortmatic)
 

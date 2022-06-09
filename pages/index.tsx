@@ -47,8 +47,12 @@ export default function Dragon() {
   const router = useRouter();
   const connection = React.useContext<any>(ConnectorContext);
   const sdk: string = connection.sdk;
-  const _blockchain: string = connection.sdk?.wallet?.blockchain;
-  const _address: string = connection.walletAddress;
+
+  const _blockchain =
+    typeof connection?.walletAddress?.split(':')[0] !== 'undefined'
+      ? connection?.walletAddress?.split(':')[0]
+      : '';
+  const _address: string = connection.walletAddress?.split(':')[1];
 
   const [contractAddress, setContractAddress] = useState<any>({});
   const [complete, setComplete] = useState<boolean>(false);
@@ -56,7 +60,7 @@ export default function Dragon() {
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [continuation, setContinuation] = useState<string | string[]>('');
   const [supply, setSupply] = useState<number>(1);
-  const [lazyMint, setLazyMint] = useState<boolean>(true);
+  const [lazyMint, setLazyMint] = useState<boolean>(false);
   const [royalties, setRoyalties] = useState<number>(0);
 
   const [state, setState] = useState({
@@ -205,6 +209,72 @@ export default function Dragon() {
             <div
               className={`col p-2 border border-dark d-inline-flex flex-column w-100 form-mx`}>
               <p>Your Network: {_blockchain}</p>
+              <div className='col pb-3 p-2 border border-dark'>
+                <p className='mb-0'>Contract Type* (select one)</p>
+                <Select
+                  className='text-black h-100 w-100'
+                  options={((): any => {
+                    switch (_blockchain) {
+                      case 'POLYGON':
+                        return [
+                          {
+                            label: 'AKKOROS ERC721 (Singles)',
+                            value:
+                              'POLYGON:0x2a890a07f9805f1338f4c6aede84ec45b77fa335',
+                            type: 'ERC721',
+                          },
+                          {
+                            label: 'AKKOROS ERC1155 (Multiples)',
+                            value:
+                              'POLYGON:0x37f5694f04bd9a9c6c0d2c2629f6a70bbfdef3ff',
+                            type: 'ERC1155',
+                          },
+                        ];
+                      case 'ETHEREUM':
+                        return [
+                          {
+                            label: 'RARIBLE ERC721 (Singles)',
+                            value:
+                              'ETHEREUM:0xF6793dA657495ffeFF9Ee6350824910Abc21356C',
+                            type: 'ERC721',
+                          },
+                          {
+                            label: 'RARIBLE ERC1155 (Multiples)',
+                            value:
+                              'ETHEREUM:0xB66a603f4cFe17e3D27B87a8BfCaD319856518B855',
+                            type: 'ERC1155',
+                          },
+                        ];
+                      case 'TEZOS':
+                        return [
+                          {
+                            label: 'RARIBLE',
+                            value: 'TEZOS:KT18pVpRXKPY2c4U2yFEGSH3ZnhB2kL8kwXS',
+                            type: 'NFT',
+                          },
+                          ,
+                        ];
+                      case 'FLOW':
+                        return [
+                          {
+                            label: 'RARIBLE',
+                            value: 'FLOW:A.01ab36aaf654a13e.RaribleNFT',
+                            type: 'NFT',
+                          },
+                          ,
+                        ];
+
+                      default:
+                        break;
+                    }
+                  })()}
+                  value={contractAddress}
+                  onChange={(e: any) => {
+                    setContractAddress(e);
+                    setSupply(1);
+                  }}
+                />
+              </div>
               {Object.keys(_metadata).map((data, key) => (
                 <FormInputs
                   show={data === 'image' || state.showInput}
@@ -216,7 +286,7 @@ export default function Dragon() {
                   style={`w-100`}
                 />
               ))}
-              {false && (
+              {contractAddress.type !== 'ERC721' && (
                 <div className='d-flex flex-column'>
                   Token Supply: {supply}
                   <Input
@@ -344,90 +414,34 @@ export default function Dragon() {
                 )}
             </div>
 
-            <div className='col pb-3 p-2 border border-dark'>
-              <p className='mb-0'>Contract Type* (select one)</p>
-              <Select
-                className='text-black h-100 w-100'
-                options={((): any => {
-                  switch (_blockchain) {
-                    case 'POLYGON':
-                      return [
-                        {
-                          label: 'AKKOROS ERC721 (Singles)',
-                          value:
-                            'POLYGON:0x2a890a07f9805f1338f4c6aede84ec45b77fa335',
-                        },
-                        {
-                          label: 'AKKOROS ERC1155 (Multiples)',
-                          value:
-                            'POLYGON:0x37f5694f04bd9a9c6c0d2c2629f6a70bbfdef3ff',
-                        },
-                      ];
-                    case 'ETHEREUM':
-                      return [
-                        {
-                          label: 'RARIBLE ERC721 (Singles)',
-                          value:
-                            'ETHEREUM:0xF6793dA657495ffeFF9Ee6350824910Abc21356C',
-                        },
-                        {
-                          label: 'RARIBLE ERC1155 (Multiples)',
-                          value:
-                            'ETHEREUM:0xB66a603f4cFe17e3D27B87a8BfCaD319856518B855',
-                        },
-                      ];
-                    case 'TEZOS':
-                      return [
-                        {
-                          label: 'RARIBLE',
-                          value: 'TEZOS:KT18pVpRXKPY2c4U2yFEGSH3ZnhB2kL8kwXS',
-                        },
-                        ,
-                      ];
-                    case 'FLOW':
-                      return [
-                        {
-                          label: 'RARIBLE',
-                          value: 'FLOW:A.01ab36aaf654a13e.RaribleNFT',
-                        },
-                        ,
-                      ];
-
-                    default:
-                      break;
-                  }
-                })()}
-                value={contractAddress}
-                onChange={(e: any) => {
-                  setContractAddress(e);
-                  console.log(typeof e, e);
-                }}
-              />
-            </div>
             <div
               className={`col p-2 border border-dark d-inline-flex flex-column w-100 form-mx`}>
-              <ToggleButton
-                label={
-                  <>
-                    <span className='mb-3'>
-                      Enable Lazy Minting (Free Minting)
-                      <br />
-                      NFT Will Be Off-Chain Until Purchased or Transferred
-                    </span>
-                  </>
-                }
-                getToggleStatus={(e) => {
-                  setLazyMint(e);
-                }}
-                defaultStatus={lazyMint}
-              />
+              {_blockchain === 'ETHEREUM' && (
+                <>
+                  <ToggleButton
+                    label={
+                      <>
+                        <span className='mb-3'>
+                          Enable Lazy Minting (Free Minting)
+                          <br />
+                          NFT Will Be Off-Chain Until Purchased or Transferred
+                        </span>
+                      </>
+                    }
+                    getToggleStatus={(e) => {
+                      setLazyMint(e);
+                    }}
+                    defaultStatus={lazyMint}
+                  />
+                </>
+              )}
               <hr />
               <div className={`d-flex flex-column w-100`}>
                 <Button
                   disabled={
+                    supply === 0 ||
                     state.name.length === 0 ||
-                    state.description.length === 0 ||
-                    typeof contractAddress !== 'object'
+                    typeof contractAddress !== 'object' || state.fileData.length === 0
                   }
                   buttonStyle={`btn-dark`}
                   onClick={async () => {
@@ -465,18 +479,15 @@ export default function Dragon() {
                         return _tkn;
                       })
                       .then(async (cid) => {
-                        console.log(_blockchain + ':' + _address,)
+                        console.log(
+                          _blockchain + ':' + _address,
+                          contractAddress.value
+                        );
                         const _nft = await TAKO.mint({
                           sdk,
                           collection: contractAddress.value,
                           data: {
                             uri: 'ipfs://ipfs/' + cid,
-                            creators: [
-                              {
-                                account: `${_blockchain}:${_address}`,
-                                value: 1000,
-                              },
-                            ],
                             supply: supply,
                             lazyMint: lazyMint,
                             royalties: [
@@ -494,10 +505,14 @@ export default function Dragon() {
                         setShow(false);
                       })
                       .then(() => {
+                        setSupply(1);
                         setState({
                           ..._metadata,
+                          name: '',
+                          description: '',
                           type: '',
                           mimeType: '',
+
                           attributes: [],
                           token: '',
                           disable: true,

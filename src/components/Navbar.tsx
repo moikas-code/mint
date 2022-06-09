@@ -45,7 +45,7 @@ function Navbar() {
               isConnected={status !== 'disconnected'}
               onConnect={() => router.push('/connect')}
               onPress={() => setShow(!show)}
-              address={connection.walletAddress}
+              address={connection.walletAddress?.split(':')[1]}
             />
           </div>
         </div>

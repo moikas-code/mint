@@ -739,17 +739,21 @@ const TAKO = {
     data: any;
   }) => {
     if (!sdk) return;
-    const mintAction = await sdk.nft.mint({
-      collectionId: collection,
+    const mintAction = await sdk.nft
+      .mint({
+        collectionId: collection,
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+    const nft_data = await mintAction.submit(data).catch((error: any) => {
+      console.log(error);
     });
-    const nft_data = await mintAction.submit(data);
 
-    if (nft_data.type === MintType.OFF_CHAIN) {
-      return nft_data.itemId;
-    } else if (nft_data.type === MintType.ON_CHAIN) {
+    if (nft_data.type === MintType.ON_CHAIN) {
       await nft_data.transaction.wait();
-      return nft_data.itemId;
     }
+    return await nft_data.itemId;
   },
   sell_nft: async ({
     sdk,
@@ -780,7 +784,14 @@ const TAKO = {
       price: parseFloat(price.toString()),
       currency: currency,
       originFees:
-        blockchain == 'ETHEREUM'
+        blockchain == 'POLYGON'
+          ? [
+              {
+                account: 'POLYGON:0x877728846bFB8332B03ac0769B87262146D777f3' as any,
+                value: 100,
+              },
+            ]
+          : blockchain == 'ETHEREUM'
           ? [
               {
                 account: 'ETHEREUM:0x877728846bFB8332B03ac0769B87262146D777f3' as any,
