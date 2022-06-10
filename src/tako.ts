@@ -770,7 +770,8 @@ const TAKO = {
     blockchain: string;
     currency: any;
   }) => {
-    // console.log(sdk, nft_id, amount, price, blockchain, currency);
+    console.log(sdk, nft_id, amount, price, blockchain, currency);
+    if (!sdk) return;
     const {
       supportedCurrencies, // list of currency types supported by the blockchain (ETH, ERC20 etc.)
       maxAmount, // max amount of the NFT that can be put on sale
@@ -778,38 +779,54 @@ const TAKO = {
       submit, // use this Action to submit information after user input
     } = await sdk.order.sell({itemId: nft_id});
     // if (amount <= maxAmount) {
-    // console.log(supportedCurrencies);
+    console.log(supportedCurrencies);
     const orderId = await submit({
       amount,
-      price: parseFloat(price.toString()),
-      currency: currency,
+      price: price,
+      currency:
+        blockchain == 'POLYGON' || blockchain == 'POLYGON'
+          ? {
+              '@type': 'ETH',
+              blockchain: blockchain,
+            }
+          : blockchain == 'TEZOS'
+          ? {
+              '@type': 'TEZ',
+              blockchain: blockchain,
+            }
+          : blockchain == ' FLOW'
+          ? {
+              '@type': 'FLOW',
+              blockchain: blockchain,
+            }
+          : {},
       originFees:
         blockchain == 'POLYGON'
           ? [
               {
                 account: 'POLYGON:0x877728846bFB8332B03ac0769B87262146D777f3' as any,
-                value: 100,
+                value: 5,
               },
             ]
           : blockchain == 'ETHEREUM'
           ? [
               {
                 account: 'ETHEREUM:0x877728846bFB8332B03ac0769B87262146D777f3' as any,
-                value: 100,
+                value: 5,
               },
             ]
           : blockchain == 'TEZOS'
           ? [
               {
                 account: 'TEZOS:tz1Q5duBxjCNy1c5Kba63Mf5Jqz9wyKqXFAk' as any,
-                value: 100,
+                value: 5,
               },
             ]
           : blockchain == ' FLOW'
           ? [
               {
                 account: 'FLOW:0x54607bd2c9da71d0' as any,
-                value: 100,
+                value: 5,
               },
             ]
           : [],

@@ -8,7 +8,7 @@ import {ConnectorContext} from '@/src/components/connector/sdk-connection-provid
 export default function Connect() {
   const router = useRouter();
   const connection = React.useContext(ConnectorContext);
-
+  console.log(connection.state.status);
   return (
     <>
       <style jsx>{`
@@ -17,7 +17,12 @@ export default function Connect() {
         }
       `}</style>
       <div className='h-100 d-flex flex-column justify-content-center align-items-center'>
-        <p>Please Connect to Continue with App</p>
+        {connection.state.status !== 'connected' ? (
+          <h4>Please Connect to Continue with App</h4>
+        ) : (
+          <h4>You Are Connected</h4>
+        )}
+        <br/>
         <ConnectOptions />
         <br />
         <Link href={'/'}>

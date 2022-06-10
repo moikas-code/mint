@@ -59,6 +59,8 @@ export default function Dragon() {
   const [show, setShow] = useState<boolean>(false);
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [continuation, setContinuation] = useState<string | string[]>('');
+  const [price, setPrice] = useState<number>(0);
+  const [listNFT, setListNFT] = useState<boolean>(false);
   const [supply, setSupply] = useState<number>(1);
   const [lazyMint, setLazyMint] = useState<boolean>(false);
   const [royalties, setRoyalties] = useState<number>(0);
@@ -424,7 +426,9 @@ export default function Dragon() {
                         <span className='mb-3'>
                           Enable Lazy Minting (Free Minting)
                           <br />
-                          NFT Will Be Off-Chain Until Purchased or Transferred
+                          {lazyMint
+                            ? 'NFT Will Be Off-Chain Until Purchased or Transferred'
+                            : 'NFT Will Be On-Chain'}
                         </span>
                       </>
                     }
@@ -435,12 +439,60 @@ export default function Dragon() {
                   />
                 </>
               )}
-              By Pressing Mint You Are Stating That You Are Authorized To Upload
-              The Following File To The Blockchain and IPFS as The Owner and
-              take Responsibility for any Damages or License Issues that May
+              <hr />
+              {
+                <>
+                  <ToggleButton
+                    label={
+                      <>
+                        <span className='mb-3'>List NFT</span> - We charge a
+                        0.05% Listing Fee when purchased to help keep the lights
+                        on
+                      </>
+                    }
+                    getToggleStatus={(e) => {
+                      setListNFT(e);
+                    }}
+                    defaultStatus={listNFT}
+                  />
+                </>
+              }
+              {listNFT && (
+                <div className='d-flex flex-column'>
+                  Token Price: {price}
+                  (Listed in Your Chains Native Token)
+                  <Input
+                    id={'token-price'}
+                    label={'NFT Price'}
+                    type={'number'}
+                    value={price}
+                    placeholder={price}
+                    inputStyle={''}
+                    onChange={(e: any) => {
+                      const {value} = e.target;
+
+                      value !== undefined && parseInt(value) > 1000000000
+                        ? setPrice(10000000000)
+                        : value !== undefined && parseInt(value) < 0
+                        ? setPrice(0)
+                        : value == undefined || value == null || value == ''
+                        ? setPrice(0)
+                        : setPrice(value);
+                    }}
+                  />
+                  (You will receive a signature to approve your listing after
+                  minting. )
+                </div>
+              )}
+              <hr />
+              By Pressing Sumbit You Are Stating That You Are Authorized To
+              Upload The Following File To The Blockchain and IPFS as The Owner
+              and take Responsibility for any Damages or License Issues that May
               Occur.
               <hr />
-              <div className={`d-flex flex-column w-100`}>
+              <div
+                className={`d-flex flex-column w-100 justify-content-center`}>
+                  <br/>
                 <Button
                   disabled={
                     supply === 0 ||
@@ -448,7 +500,7 @@ export default function Dragon() {
                     typeof contractAddress !== 'object' ||
                     state.fileData.length === 0
                   }
-                  buttonStyle={`btn-dark`}
+                  className={`btn btn-dark`}
                   onClick={async () => {
                     await setState({...state, isLoading: true});
                     const json = JSON.stringify({
@@ -509,7 +561,15 @@ export default function Dragon() {
                         return _nft;
                         setShow(false);
                       })
-                      .then(() => {
+                      .then(async (sell_nft) => {
+                        listNFT &&
+                          (await TAKO.sell_nft({
+                            sdk,
+                            price,
+                            amount: supply,
+                            blockchain: _blockchain,
+                            nft_id: sell_nft,
+                          }));
                         setSupply(1);
                         setState({
                           ..._metadata,
@@ -530,8 +590,10 @@ export default function Dragon() {
                         });
                       });
                   }}>
-                  Mint
+                  Submit
                 </Button>
+                <p className='mx-auto'>Make sure to check your Gas before you approve to ensure your
+                transaction goes through</p>
               </div>
               {state.token.length > 0 && (
                 <>
