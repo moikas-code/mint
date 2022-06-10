@@ -522,6 +522,11 @@ export default function Dragon() {
                           trait_type: 'Platform',
                           value: 'TAKO LABS',
                         },
+                        ,
+                        {
+                          trait_type: 'Platform URL',
+                          value: 'https://mint.takolabs.io',
+                        },
                       ],
                       properties: state.properties,
                     });
