@@ -288,30 +288,32 @@ export default function Dragon() {
                   style={`w-100`}
                 />
               ))}
-              {contractAddress.type !== 'ERC721' && (
-                <div className='d-flex flex-column'>
-                  Token Supply: {supply}
-                  <Input
-                    id={'token-supply'}
-                    label={'NFT Supply'}
-                    type={'number'}
-                    value={supply.toString()}
-                    placeholder={supply.toString()}
-                    inputStyle={''}
-                    onChange={(e: any) => {
-                      const {value} = e.target;
-                      value !== undefined && parseInt(value) > 1000000000
-                        ? setSupply(10000000000)
-                        : value !== undefined && parseInt(value) < 0
-                        ? setSupply(1)
-                        : value == undefined || value == null || value == ''
-                        ? setSupply(1)
-                        : setSupply(parseInt(value.match(/\d+/gi).join('')));
-                    }}
-                  />
-                  <hr />
-                </div>
-              )}
+              {console.log(typeof contractAddress.type !== 'undefined')}
+              {typeof contractAddress.type !== 'undefined' &&
+                contractAddress.type !== 'ERC721' && (
+                  <div className='d-flex flex-column'>
+                    Token Supply: {supply}
+                    <Input
+                      id={'token-supply'}
+                      label={'NFT Supply'}
+                      type={'number'}
+                      value={supply.toString()}
+                      placeholder={supply.toString()}
+                      inputStyle={''}
+                      onChange={(e: any) => {
+                        const {value} = e.target;
+                        value !== undefined && parseInt(value) > 1000000000
+                          ? setSupply(10000000000)
+                          : value !== undefined && parseInt(value) < 0
+                          ? setSupply(1)
+                          : value == undefined || value == null || value == ''
+                          ? setSupply(1)
+                          : setSupply(parseInt(value.match(/\d+/gi).join('')));
+                      }}
+                    />
+                    <hr />
+                  </div>
+                )}
               <>
                 Royalties: {royalties}%
                 <Input
@@ -492,7 +494,7 @@ export default function Dragon() {
               <hr />
               <div
                 className={`d-flex flex-column w-100 justify-content-center`}>
-                  <br/>
+                <br />
                 <Button
                   disabled={
                     supply === 0 ||
@@ -592,8 +594,10 @@ export default function Dragon() {
                   }}>
                   Submit
                 </Button>
-                <p className='mx-auto'>Make sure to check your Gas before you approve to ensure your
-                transaction goes through</p>
+                <p className='mx-auto'>
+                  Make sure to check your Gas before you approve to ensure your
+                  transaction goes through
+                </p>
               </div>
               {state.token.length > 0 && (
                 <>
