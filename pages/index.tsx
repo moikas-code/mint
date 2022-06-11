@@ -64,6 +64,7 @@ export default function Dragon() {
   const [supply, setSupply] = useState<number>(1);
   const [lazyMint, setLazyMint] = useState<boolean>(false);
   const [royalties, setRoyalties] = useState<number>(0);
+  const [collections, setCollections] = useState<Array<any>>([]);
 
   const [state, setState] = useState({
     ..._metadata,
@@ -115,9 +116,52 @@ export default function Dragon() {
     }
   `;
   const [Owned_Collections, {loading, error, data}] = useLazyQuery(query, {
-    onCompleted: ({Owned_Collections}) => {
+    onCompleted: async ({Owned_Collections}) => {
       if (Owned_Collections !== null && Owned_Collections !== undefined) {
+        let cleanCollections: Array<any> = [];
         console.log(Owned_Collections);
+        for await (var collection of Owned_Collections.collections.filter(
+          ({features}) => features.length === 6
+        )) {
+          async function getNFTTotal(id) {
+            const nftTotal = await TAKO.get_nfts_by_collection({
+              sdk,
+              collection: id,
+            });
+            return nftTotal.total;
+          }
+
+          const total = await getNFTTotal(collection.id);
+          if (
+            ![
+              'POLYGON:0xe9722a06a7f2ec8523c1aa70cbead9743c7e776c',
+              'POLYGON:0x2a890a07f9805f1338f4c6aede84ec45b77fa335',
+              'POLYGON:0x37f5694f04bd9a9c6c0d2c2629f6a70bbfdef3ff',
+              'ETHEREUM:0x2e24c674ac13eff59c0e289ceb63e0c8e696e152',
+              'POLYGON:0x05dd2e2986a5bde3dd98fd49f7f7e4c0517c8811',
+              'POLYGON:0x72922f1de9a9a7b19009e9b05b918f29280e0ce1',
+              'POLYGON:0x5ed105bb186613163169685519ac8ec7c2f1aa48',
+              'POLYGON:0x761769937e86a838ec63acca2f035cefdec12c0c',
+              'POLYGON:0xa92d3e618f54817c53ec7e92f24659eff59e7a02',
+              'POLYGON:0xc50ab6be157f08020787b8cb11d631fcce78e3dd',
+              'POLYGON:0xc58529ab24db69a2a4d8aeb3ed1a9f50dbf16fa1',
+              'POLYGON:0xfd5af2d8acb567fe8033112b4398351147d6d358',
+              'POLYGON:0x3c798ac3ba87a9abd550c3040862f14508b87308',
+              'POLYGON:0x84842a1c4016c917c64c2b52664f264d1876eda4',
+              'POLYGON:0x4cb1bc245fe0f0e1e15ec9d97fe00479079f5cb9',
+              'POLYGON:0x99e508775089e093c0adb0e25a5573d5f2fca4a8',
+            ].includes(collection.id)
+          ) {
+            cleanCollections.push({
+              label: `${collection.name} | ${collection.type} | # of items: ${total}`,
+              value: collection.id,
+              type: collection.type,
+              total,
+            });
+          }
+        }
+
+        setCollections(cleanCollections.sort((a, b) => b.total - a.total));
         setComplete(true);
       }
     },
@@ -220,54 +264,56 @@ export default function Dragon() {
                       case 'POLYGON':
                         return [
                           {
-                            label: 'AKKOROS ERC721 (Singles)',
+                            label: 'AKKOROS ERC721 (Singles) | Shared',
                             value:
                               'POLYGON:0x2a890a07f9805f1338f4c6aede84ec45b77fa335',
                             type: 'ERC721',
                           },
                           {
-                            label: 'AKKOROS ERC1155 (Multiples)',
+                            label: 'AKKOROS ERC1155 (Multiples) | Shared',
                             value:
                               'POLYGON:0x37f5694f04bd9a9c6c0d2c2629f6a70bbfdef3ff',
                             type: 'ERC1155',
                           },
+                          ...collections,
                         ];
                       case 'ETHEREUM':
                         return [
                           {
-                            label: 'RARIBLE ERC721 (Singles)',
+                            label: 'RARIBLE ERC721 (Singles) | Shared',
                             value:
                               'ETHEREUM:0xF6793dA657495ffeFF9Ee6350824910Abc21356C',
                             type: 'ERC721',
                           },
                           {
-                            label: 'RARIBLE ERC1155 (Multiples)',
+                            label: 'RARIBLE ERC1155 (Multiples) | Shared',
                             value:
                               'ETHEREUM:0xB66a603f4cFe17e3D27B87a8BfCaD319856518B855',
                             type: 'ERC1155',
                           },
+                          ...collections,
                         ];
                       case 'TEZOS':
                         return [
                           {
-                            label: 'RARIBLE',
+                            label: 'RARIBLE | Shared',
                             value: 'TEZOS:KT18pVpRXKPY2c4U2yFEGSH3ZnhB2kL8kwXS',
                             type: 'NFT',
                           },
-                          ,
+                          ...collections,
                         ];
                       case 'FLOW':
                         return [
                           {
-                            label: 'RARIBLE',
+                            label: 'RARIBLE | Shared',
                             value: 'FLOW:A.01ab36aaf654a13e.RaribleNFT',
                             type: 'NFT',
                           },
-                          ,
+                          ...collections,
                         ];
 
                       default:
-                        break;
+                        return collections;
                     }
                   })()}
                   value={contractAddress}
@@ -288,7 +334,7 @@ export default function Dragon() {
                   style={`w-100`}
                 />
               ))}
-              {console.log(typeof contractAddress.type !== 'undefined')}
+
               {typeof contractAddress.type !== 'undefined' &&
                 contractAddress.type !== 'ERC721' && (
                   <div className='d-flex flex-column'>

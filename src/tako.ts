@@ -711,8 +711,7 @@ const TAKO = {
     sdk: any;
     collection: any;
   }) => {
-    // if (!sdk) return;
-    // console.log(collection);
+    if (!sdk) return;
     return await sdk.apis.item.getItemsByCollection({collection});
   },
   get_nft_data: async ({sdk, collection}: {sdk: any; collection: any}) => {
