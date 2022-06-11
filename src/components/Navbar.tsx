@@ -52,7 +52,13 @@ function Navbar() {
         {show && (
           <div
             className={`wallet-button-items d-flex flex-column bg-grey position-absolute end-0`}>
-
+<WalletButtonItem
+              text={`Create Contract`}
+              onPress={() => {
+                router.push('https://deploy.takolabs.io/');
+                setShow(false);
+              }}
+            />
             <WalletButtonItem
               text={`Disconnect`}
               onPress={() => {
