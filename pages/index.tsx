@@ -119,9 +119,9 @@ export default function Dragon() {
     onCompleted: async ({Owned_Collections}) => {
       if (Owned_Collections !== null && Owned_Collections !== undefined) {
         let cleanCollections: Array<any> = [];
-        console.log(Owned_Collections);
         for await (var collection of Owned_Collections.collections.filter(
-          ({features}) => features.length === 6
+          ({features}) =>
+            features.includes('MINT_WITH_ADDRESS' || 'MINT_AND_TRANSFER')
         )) {
           async function getNFTTotal(id) {
             const nftTotal = await TAKO.get_nfts_by_collection({
