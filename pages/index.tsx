@@ -56,8 +56,10 @@ export default function Dragon() {
 
   const [contractAddress, setContractAddress] = useState<any>({});
   const [complete, setComplete] = useState<boolean>(false);
+  const [_error, setError] = useState<any>('');
   const [show, setShow] = useState<boolean>(false);
-  const [showOptions, setShowOptions] = useState<boolean>(false);
+  const [showListText, setShowListText] = useState<boolean>(false);
+  const [nftid, setNFTID] = useState<any>(null);
   const [continuation, setContinuation] = useState<string | string[]>('');
   const [price, setPrice] = useState<number>(0);
   const [listNFT, setListNFT] = useState<boolean>(false);
@@ -190,7 +192,7 @@ export default function Dragon() {
           },
         },
       });
-
+    setLazyMint(false);
     return () => {
       setComplete(false);
     };
@@ -229,6 +231,7 @@ export default function Dragon() {
         twitter='takolabs'
         keywords='gaming, nfts, web3'
       />
+      {console.log(show)}
       <Navbar />
       {connection.state.status === 'disconnected' ||
       connection.state.status === 'initializing' ||
@@ -248,13 +251,14 @@ export default function Dragon() {
           </Button>
           <br />
         </div>
-      ) : (
+      ) : !show ? (
         <div className='nft-form w-100 d-flex flex-column justify-content-center mx-auto'>
           <div className='d-flex flex-column border border-dark m-5 h-100'>
             {/* TOP SECTION */}
             <div
               className={`col p-2 border border-dark d-inline-flex flex-column w-100 form-mx`}>
               <p>Your Network: {_blockchain}</p>
+              <p>{error}</p>
               <div className='col pb-3 p-2 border border-dark'>
                 <p className='mb-0'>Contract Type* (select one)</p>
                 <Select
@@ -551,6 +555,7 @@ export default function Dragon() {
                   className={`btn btn-dark`}
                   onClick={async () => {
                     await setState({...state, isLoading: true});
+                    setShow(true);
                     const json = JSON.stringify({
                       ..._metadata,
                       name: state.name,
@@ -607,15 +612,30 @@ export default function Dragon() {
                               },
                             ],
                           },
-                        }).catch((err) => {
-                          console.log(err.message);
                         });
-                        console.log(_nft);
-                        return _nft;
-                        setShow(false);
+                        console.log('NFT', _nft);
+                        if (_nft.status === 500) {
+                          setShow(false);
+                          setError('Rarible Server Error');
+                        } else if (_nft.code === 4001) {
+                          setShow(false);
+                          setError('User Cancelled Transaction');
+                        } else if (_nft.code === parseInt('-32603')) {
+                          setShow(false);
+                          setError(
+                            'Transaction Underpriced, Please Try Again and Check your Gas'
+                          );
+                        } else {
+                          setNFTID(_nft);
+                          return _nft;
+                        }
                       })
                       .then(async (sell_nft) => {
-                        listNFT &&
+                        sell_nft !== undefined &&
+                          listNFT &&
+                          setShowListText(true);
+                        sell_nft !== undefined &&
+                          listNFT &&
                           (await TAKO.sell_nft({
                             sdk,
                             price,
@@ -686,6 +706,38 @@ export default function Dragon() {
               </p>
             </div>
           </div>
+        </div>
+      ) : (
+        <div className='h-100 w-100 d-flex flex-column justify-content-center align-items-center'>
+          <h1>MINT | Tako Labs</h1>
+          <hr />
+          <p>Mint Your NFT's with Us ❤</p>
+          {!showListText && <p>Listing</p>}
+          {nftid === null ? (
+            <p>Minting</p>
+          ) : (
+            <p>
+              Your NFT:{' '}
+              <a
+                target={'_blank'}
+                href={`https://rarible.com/token/${
+                  nftid.split(':')[0] === 'ETHEREUM'
+                    ? ''
+                    : nftid.split(':')[0].toLowerCase()
+                }/${nftid.split(':')[1]}:${nftid.split(':')[2]}?tab=details`}>
+                {nftid.split(':')[1]}:{nftid.split(':')[2]}
+              </a>
+            </p>
+          )}
+          <Button
+            className={'btn btn-outline-dark'}
+            onClick={() => {
+              setShow(false);
+              setError('');
+            }}>
+            Close
+          </Button>
+          <br />
         </div>
       )}
     </>

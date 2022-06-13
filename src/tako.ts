@@ -723,9 +723,11 @@ const TAKO = {
     try {
       if (!sdk) return;
       const result = await sdk.nft.createCollection(collectionRequest);
-      return result;
+      await result.tx.wait();
+      return result.address;
     } catch (error) {
       console.log(error);
+      return error;
     }
   },
   mint: async ({
@@ -737,22 +739,24 @@ const TAKO = {
     collection: any;
     data: any;
   }) => {
-    if (!sdk) return;
-    const mintAction = await sdk.nft
-      .mint({
-        collectionId: collection,
-      })
-      .catch((error: any) => {
-        console.log(error);
-      });
-    const nft_data = await mintAction.submit(data).catch((error: any) => {
-      console.log(error);
-    });
+    try {
+      if (!sdk) return;
+      const mintAction = await sdk.nft
+        .mint({
+          collectionId: collection,
+        })
+        .catch((error: any) => {
+          console.log(error);
+        });
+      const nft_data = await mintAction.submit(data)
 
-    if (nft_data.type === MintType.ON_CHAIN) {
-      await nft_data.transaction.wait();
+      if (nft_data.type === MintType.ON_CHAIN) {
+        await nft_data.transaction.wait();
+      }
+      return await nft_data.itemId;
+    } catch (error) {
+      return error;
     }
-    return await nft_data.itemId;
   },
   sell_nft: async ({
     sdk,
