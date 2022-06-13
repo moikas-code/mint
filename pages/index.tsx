@@ -717,7 +717,6 @@ export default function Dragon() {
             <p>Minting</p>
           ) : (
             <p>
-              Your NFT:{' '}
               <a
                 target={'_blank'}
                 href={`https://rarible.com/token/${
@@ -725,7 +724,7 @@ export default function Dragon() {
                     ? ''
                     : nftid.split(':')[0].toLowerCase()
                 }/${nftid.split(':')[1]}:${nftid.split(':')[2]}?tab=details`}>
-                {nftid.split(':')[1]}:{nftid.split(':')[2]}
+               Your NFT on Rarible
               </a>
             </p>
           )}
