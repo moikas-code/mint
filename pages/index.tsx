@@ -603,7 +603,7 @@ export default function Dragon() {
                           collection: contractAddress.value,
                           data: {
                             uri: 'ipfs://ipfs/' + cid,
-                            supply: supply,
+                            supply: supply>0?supply:1,
                             lazyMint: lazyMint,
                             royalties: [
                               {
