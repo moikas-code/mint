@@ -741,14 +741,12 @@ export default function Dragon() {
             <p>
               <a
                 target={'_blank'}
-                href={
-                  /**`https://rarible.com/token/${
+                href={`https://rarible.com/token/${
                   nftid.split(':')[0] === 'ETHEREUM'
                     ? ''
                     : nftid.split(':')[0].toLowerCase()
-                }/${nftid.split(':')[1]}:${nftid.split(':')[2]}?tab=details`*/ ''
-                }>
-                {`${JSON.stringify(nftid)}`}
+                }/${nftid.split(':')[1]}:${nftid.split(':')[2]}?tab=details`}>
+                {/* {`${JSON.stringify(nftid)}`} */}
                 Your NFT on Rarible
               </a>
             </p>
