@@ -320,7 +320,7 @@ export default function Dragon() {
                           {
                             label: 'RARIBLE | Shared',
                             value:
-                              'SOLANA:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+                              'SOLANA:metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
                             type: 'NFT',
                           },
                           ...collections,
@@ -350,7 +350,8 @@ export default function Dragon() {
               ))}
 
               {typeof contractAddress.type !== 'undefined' &&
-                contractAddress.type !== 'ERC721' && (
+                contractAddress.type !== 'ERC721' &&
+                contractAddress.type !== 'NFT' && (
                   <div className='d-flex flex-column'>
                     Token Supply: {supply}
                     <Input
@@ -569,10 +570,12 @@ export default function Dragon() {
                     const json = JSON.stringify({
                       ..._metadata,
                       name: state.name,
+                      symbol: 'TAKO',
                       description: state.description,
                       image: state.fileData,
                       animation_url: state.animation_url,
                       platform_url: 'https://mint.takolabs.io',
+                      seller_fee_basis_points: royalties * 100 || 0,
                       attributes: [
                         ...state.attributes,
                         {
@@ -589,7 +592,16 @@ export default function Dragon() {
                           value: 'https://mint.takolabs.io',
                         },
                       ],
-                      properties: state.properties,
+                      properties: {
+                        creators: [
+                          {
+                            address: _address,
+                            share: 100,
+                          },
+                        ],
+
+                        ...state.properties,
+                      },
                     });
 
                     await nft
@@ -612,7 +624,7 @@ export default function Dragon() {
                           sdk,
                           collection: contractAddress.value,
                           data: {
-                            uri: 'ipfs://ipfs/' + cid,
+                            uri: 'https://ipfs.io/ipfs/' + cid,
                             supply: supply > 0 ? supply : 1,
                             lazyMint: lazyMint,
                             royalties: [
@@ -729,11 +741,13 @@ export default function Dragon() {
             <p>
               <a
                 target={'_blank'}
-                href={/**`https://rarible.com/token/${
+                href={
+                  /**`https://rarible.com/token/${
                   nftid.split(':')[0] === 'ETHEREUM'
                     ? ''
                     : nftid.split(':')[0].toLowerCase()
-                }/${nftid.split(':')[1]}:${nftid.split(':')[2]}?tab=details`*/''}>
+                }/${nftid.split(':')[1]}:${nftid.split(':')[2]}?tab=details`*/ ''
+                }>
                 {`${JSON.stringify(nftid)}`}
                 Your NFT on Rarible
               </a>

@@ -748,7 +748,7 @@ const TAKO = {
         .catch((error: any) => {
           console.log(error);
         });
-      const nft_data = await mintAction.submit(data)
+      const nft_data = await mintAction.submit(data);
 
       if (nft_data.type === MintType.ON_CHAIN) {
         await nft_data.transaction.wait();
@@ -802,34 +802,46 @@ const TAKO = {
               '@type': 'FLOW',
               blockchain: blockchain,
             }
+          : blockchain == ' SOLANA'
+          ? {
+              '@type': 'SOLANA',
+              blockchain: blockchain,
+            }
           : {},
       originFees:
         blockchain == 'POLYGON'
           ? [
               {
                 account: 'POLYGON:0x877728846bFB8332B03ac0769B87262146D777f3' as any,
-                value: 5,
+                value: 0,
               },
             ]
           : blockchain == 'ETHEREUM'
           ? [
               {
                 account: 'ETHEREUM:0x877728846bFB8332B03ac0769B87262146D777f3' as any,
-                value: 5,
+                value: 0,
               },
             ]
           : blockchain == 'TEZOS'
           ? [
               {
                 account: 'TEZOS:tz1Q5duBxjCNy1c5Kba63Mf5Jqz9wyKqXFAk' as any,
-                value: 5,
+                value: 0,
               },
             ]
           : blockchain == ' FLOW'
           ? [
               {
                 account: 'FLOW:0x54607bd2c9da71d0' as any,
-                value: 5,
+                value: 0,
+              },
+            ]
+          : blockchain == ' SOLANA'
+          ? [
+              {
+                account: 'SOLANA:98jiC2PfMNqLwUrabW3LxE15dfHCyaNX5V6nxHaP96NQ' as any,
+                value: 0,
               },
             ]
           : [],
