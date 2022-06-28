@@ -121,6 +121,7 @@ export default function Dragon() {
     onCompleted: async ({Owned_Collections}) => {
       if (Owned_Collections !== null && Owned_Collections !== undefined) {
         let cleanCollections: Array<any> = [];
+        console.log(Owned_Collections);
         for await (var collection of Owned_Collections.collections.filter(
           ({features}) =>
             features.includes('MINT_WITH_ADDRESS' || 'MINT_AND_TRANSFER')
@@ -231,7 +232,6 @@ export default function Dragon() {
         twitter='takolabs'
         keywords='gaming, nfts, web3'
       />
-      {console.log(show)}
       <Navbar />
       {connection.state.status === 'disconnected' ||
       connection.state.status === 'initializing' ||
@@ -311,6 +311,16 @@ export default function Dragon() {
                           {
                             label: 'RARIBLE | Shared',
                             value: 'FLOW:A.01ab36aaf654a13e.RaribleNFT',
+                            type: 'NFT',
+                          },
+                          ...collections,
+                        ];
+                      case 'SOLANA':
+                        return [
+                          {
+                            label: 'RARIBLE | Shared',
+                            value:
+                              'SOLANA:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
                             type: 'NFT',
                           },
                           ...collections,
@@ -603,7 +613,7 @@ export default function Dragon() {
                           collection: contractAddress.value,
                           data: {
                             uri: 'ipfs://ipfs/' + cid,
-                            supply: supply>0?supply:1,
+                            supply: supply > 0 ? supply : 1,
                             lazyMint: lazyMint,
                             royalties: [
                               {
@@ -719,12 +729,13 @@ export default function Dragon() {
             <p>
               <a
                 target={'_blank'}
-                href={`https://rarible.com/token/${
+                href={/**`https://rarible.com/token/${
                   nftid.split(':')[0] === 'ETHEREUM'
                     ? ''
                     : nftid.split(':')[0].toLowerCase()
-                }/${nftid.split(':')[1]}:${nftid.split(':')[2]}?tab=details`}>
-               Your NFT on Rarible
+                }/${nftid.split(':')[1]}:${nftid.split(':')[2]}?tab=details`*/''}>
+                {`${JSON.stringify(nftid)}`}
+                Your NFT on Rarible
               </a>
             </p>
           )}

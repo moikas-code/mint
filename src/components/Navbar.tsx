@@ -58,7 +58,7 @@ function Navbar() {
                 router.push('https://deploy.takolabs.io/');
                 setShow(false);
               }}
-            />
+            /> 
             <WalletButtonItem
               text={`Disconnect`}
               onPress={() => {
