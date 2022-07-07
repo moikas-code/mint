@@ -121,11 +121,36 @@ export default function Dragon() {
     onCompleted: async ({Owned_Collections}) => {
       if (Owned_Collections !== null && Owned_Collections !== undefined) {
         let cleanCollections: Array<any> = [];
-        console.log(Owned_Collections);
-        for await (var collection of Owned_Collections.collections.filter(
-          ({features}) =>
-            features.includes('MINT_WITH_ADDRESS' || 'MINT_AND_TRANSFER')
-        )) {
+        const filterCollections = [] as any;
+        for (let i = 0; i < Owned_Collections.collections.length; i++) {
+          const valid = await Owned_Collections.collections[i].features.map(
+            (feat) => {
+              if (
+                feat === 'MINT_WITH_ADDRESS' ||
+                feat === 'MINT_AND_TRANSFER' ||
+                feat === 'SECONDAY_SALE_FEES'
+              ) {
+                return true;
+              }
+              return false;
+            }
+          );
+          const collection = Owned_Collections.collections[i];
+          if (valid) {
+            filterCollections.push(collection);
+          }
+        }
+
+        // filterCollections.map(async (collection) => {
+        //   console.log(collection);
+
+        //   if (valid.includes(true)) {
+        //     return collection;
+        //   }
+        // });
+
+        // console.log(_arr);
+        for await (var collection of filterCollections) {
           async function getNFTTotal(id) {
             const nftTotal = await TAKO.get_nfts_by_collection({
               sdk,
@@ -318,10 +343,10 @@ export default function Dragon() {
                       case 'SOLANA':
                         return [
                           {
-                            label: 'RARIBLE | Shared',
+                            label: 'SETAG | PRIVATE',
                             value:
-                              'SOLANA:metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
-                            type: 'NFT',
+                              'SOLANA:57F3z2FFHvvTBT7Fo6jUtA1r9NjRbZWgNRH4s6gQFs8y',
+                            type: 'SOLANA-NFT',
                           },
                           ...collections,
                         ];
@@ -570,7 +595,7 @@ export default function Dragon() {
                     const json = JSON.stringify({
                       ..._metadata,
                       name: state.name,
-                      symbol: 'TAKO',
+                      symbol: '',
                       description: state.description,
                       image: state.fileData,
                       animation_url: state.animation_url,
@@ -593,13 +618,14 @@ export default function Dragon() {
                         },
                       ],
                       properties: {
+                        category: 'image',
                         creators: [
                           {
                             address: _address,
                             share: 100,
                           },
                         ],
-
+                        files: [{type: 'image/png', uri: state.fileData}],
                         ...state.properties,
                       },
                     });
